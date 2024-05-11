@@ -1,4 +1,3 @@
-from main import nodeState
 import copy
 
 
@@ -13,6 +12,7 @@ class nodeState:
         self.movimento = movimento
         self.nivel = nivel
         self.errados = 0
+        self.heuristico = 0
         # ...
 
 
@@ -120,7 +120,7 @@ def printanode(X: nodeState):
     print(f'matriz: ', end='')
     for i in range(3):
         print(f'{X.matriz[i]}, ', end='')
-    print(f'   nivel: {X.nivel}\t   movimento: {X.movimento}\t   errados: {X.errados}\n        ', end='')
+    print(f'   nivel: {X.nivel}\t   movimento: {X.movimento}\t   errados: {X.errados}\theuristico: {X.heuristico}\n        ', end='')
     for i in range(3, 6):
         print(f'{X.matriz[i]}, ', end='')
     print(f'\n        ', end='')
@@ -148,8 +148,10 @@ def printanode(X: nodeState):
 def arrumaMelhorPai(nodeFilho: nodeState, nodePai1: nodeState, nodePai2: nodeState):
     if nodePai1.nivel < nodePai2.nivel:
         nodeFilho.pai = nodePai1
+        return 1
     elif nodePai2.nivel < nodePai1.nivel:
         nodeFilho.pai = nodePai2
+        return 2
 
 
 

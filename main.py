@@ -6,9 +6,58 @@ from nodestate_lib import *
 
 
 
+def astar(raiz: nodeState, obj):
+    ABERTOS = [raiz]
+    FECHADOS = []
 
+    while ABERTOS != []:
+        filhoAtual = ABERTOS.pop(0)
+        printanode(filhoAtual)
 
+        if filhoAtual.matriz == obj:
+            return 'SUCESSO', filhoAtual
+        
+        filhosGerados = gerar_filhos(filhoAtual)
 
+        #################
+        for filhoGerado in filhosGerados:
+            atualizaErrados(filhoGerado, obj)
+            
+            #atualiza valor heuristico Fn
+            filhoGerado.heuristico = (filhoGerado.errados * 2) + filhoGerado.nivel
+
+            #detecta se está repetido em abertos ou fechados
+            repetido = False
+            for nodeAberto in ABERTOS:
+                if filhoGerado.matriz == nodeAberto.matriz: #ja esta em abertos 
+                    repetido = True
+                    #Se o filho foi alcançado por um caminho mais curto, então:
+                    #* de ao estado em ABERTOS o caminho mais curto
+                    if filhoGerado.nivel < nodeAberto.nivel:
+                        nodeAberto.pai = filhoGerado.pai
+                    break
+
+            for nodeFechado in FECHADOS:
+                if repetido == True:
+                    break
+
+                if filhoGerado.matriz == nodeFechado.matriz: #ja esta em fechados 
+                    repetido = True
+                    #Se o filho foi alcançado por um caminho mais curto, então:
+                    #* retire o estado de FECHADOS
+                    #* adicione o filho em ABERTOS
+                    if filhoGerado.nivel < nodeFechado.nivel:
+                        FECHADOS.remove(nodeFechado)
+                        ABERTOS.append(filhoGerado)
+                    break
+            
+            if repetido == False: #nao esta em fechados ou abertos
+                ABERTOS.append(filhoGerado)
+        ######################
+
+        FECHADOS.append(filhoAtual)
+        ABERTOS.sort(key=lambda x: x.heuristico) #funcao achada no google
+    return 'FALHA', None
 
 
 
@@ -20,9 +69,9 @@ from nodestate_lib import *
 
 if __name__ == "__main__":
     #0 = vazio
-    raiz = nodeState([0, 1, 3,
-                      5, 2, 6,
-                      4, 7, 8])
+    raiz = nodeState([1, 0, 2,
+                      5, 3, 7,
+                      8, 6, 4])
     matrizObjetivo = [1, 2, 3,
                       4, 5, 6,
                       7, 8, 0]
@@ -42,17 +91,7 @@ if __name__ == "__main__":
 
 
 
-    print(f'1-heuristica hill climbing, 2-heuristica melhor escolha?: ', end='')
-    escolha = int(input())
-    
-    match escolha:
-        case 1:
-            resultado, filhoFinal = heuristica_hill_climbing(raiz, matrizObjetivo, nivelMax)
-        case 2:
-            resultado, filhoFinal = heuristica_melhorescolha(raiz, matrizObjetivo, nivelMax)
-        case _:
-            exit(f'1 ou 2 pls!')
-
+    resultado, filhoFinal = astar(raiz, matrizObjetivo)
 
 
 
