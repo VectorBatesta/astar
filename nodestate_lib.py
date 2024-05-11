@@ -2,6 +2,30 @@ from main import nodeState
 import copy
 
 
+
+
+
+class nodeState:
+    def __init__(self, matriz, pai = None, movimento = None, nivel = 0):
+        self.matriz = matriz
+        self.filhos = []
+        self.pai = pai
+        self.movimento = movimento
+        self.nivel = nivel
+        self.errados = 0
+        # ...
+
+
+
+
+
+
+
+
+
+
+
+
 def gerar_filhos(nodePai: nodeState):
     listaGerada = []
     
@@ -107,3 +131,71 @@ def printanode(X: nodeState):
     for i in range(9):
         if X.matriz[i] == ' ':
             X.matriz[i] = 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def arrumaMelhorPai(nodeFilho: nodeState, nodePai1: nodeState, nodePai2: nodeState):
+    if nodePai1.nivel < nodePai2.nivel:
+        nodeFilho.pai = nodePai1
+    elif nodePai2.nivel < nodePai1.nivel:
+        nodeFilho.pai = nodePai2
+
+
+
+
+#escolhe melhor da lista
+def escolheMelhor(lista):
+    if lista == []:
+        exit(f'bro pq q a lista ta empty')
+
+    node_escolhido = None
+    menorvalor = 999
+
+    #acha o nó da lista com menor .errados
+    for node in lista:
+        if node.errados < menorvalor:
+            menorvalor = node.errados
+            node_escolhido = node
+
+    lista.remove(node_escolhido)
+    return node_escolhido #envia o nó da lista com errados menor pro return
+
+
+
+
+
+
+
+def atualizaErrados(node: nodeState, matrizobj):
+    node.errados = 0
+
+    for i in range(9):
+        if node.matriz[i] != matrizobj[i]:
+            node.errados += 1
+
+    return node.errados   
+
+
+
+
+
+
+def printaCaminhoAteRaiz(filhoFinal: nodeState):
+    movimentos = []
+    while filhoFinal.pai != None:
+        movimentos.append(filhoFinal.movimento)
+        filhoFinal = filhoFinal.pai
+    
+    for i in reversed(range(len(movimentos))):
+        print(f'{movimentos[i]}, ', end='')
